@@ -1,41 +1,20 @@
-# VYRON AI Frontend
+# VYRON AI — Interface Minimal
 
-Versão reconstruída do VYRON para funcionar como interface de uma IA especialista em programação, debugging, arquitetura e desenvolvimento web.
+Interface frontend baseada no conceito visual aprovado: foco total em chat + projeto atual.
 
-## Como abrir
-Abra `index.html` diretamente ou publique a pasta em GitHub Pages.
+## Abrir
+Abra `index.html` no navegador ou publique a pasta no GitHub Pages.
 
-## O que funciona agora
-- Interface completa e responsiva
-- Chat em modo demonstração
-- Sessões persistidas em localStorage
-- Memórias locais
-- Projetos locais
-- Upload/drop de arquivos para contexto visual
-- Detecção simples de stack pelos nomes/extensões
-- Modos de trabalho
-- Knowledge Engine e activity trace
-- Configuração de endpoint do backend
+## Recursos já funcionais no frontend
+- sessões/histórico local
+- modo AUTO / DEBUG / BUILD
+- criação de projeto
+- upload e drag-and-drop de arquivos
+- detecção simples de stack
+- contexto do projeto
+- chat demo
+- persistência via localStorage
+- layout responsivo
 
-## Para ativar IA real
-Crie um backend seguro e configure em `Configurações > Endpoint do backend`.
-O frontend envia POST JSON com aproximadamente:
-
-```json
-{
-  "message": "texto do usuário",
-  "mode": "DEBUG",
-  "web": true,
-  "memory": true,
-  "memories": [],
-  "files": [{"name":"app.js","type":"text/javascript","size":1234}]
-}
-```
-
-O backend deve responder:
-
-```json
-{"answer":"resposta da IA"}
-```
-
-**Não coloque chaves secretas no frontend.**
+## Próximo passo
+Conectar o composer ao backend VYRON Core (modelo de IA, Supabase, pesquisa web e ferramentas).

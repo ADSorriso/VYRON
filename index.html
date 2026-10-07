@@ -3,200 +3,146 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#070908" />
-  <title>VYRON AI // Software Engineer</title>
-  <meta name="description" content="VYRON AI — workspace inteligente para programação, debugging, arquitetura e desenvolvimento web." />
+  <meta name="theme-color" content="#070a08" />
+  <title>VYRON — AI Software Engineer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <canvas id="matrix" aria-hidden="true"></canvas>
-  <div class="scanlines" aria-hidden="true"></div>
+  <div class="matrix" aria-hidden="true"></div>
 
-  <div class="boot" id="boot">
-    <div class="boot-core">
-      <div class="boot-logo"><span>V</span></div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">V</div>
       <div>
-        <strong>VYRON AI</strong>
-        <small>SOFTWARE ENGINEER CORE</small>
+        <strong>VYRON</strong>
+        <span>AI SOFTWARE ENGINEER</span>
       </div>
-      <div class="boot-log" id="bootLog"></div>
-      <div class="boot-bar"><i id="bootBar"></i></div>
     </div>
-  </div>
+    <div class="core-status"><i></i><span>CORE ONLINE</span></div>
+    <div class="top-actions">
+      <button id="newProjectBtn" class="btn btn-outline">＋ NOVO PROJETO</button>
+      <button id="settingsBtn" class="icon-btn" aria-label="Configurações">⚙</button>
+    </div>
+  </header>
 
   <div class="app-shell">
-    <header class="topbar">
-      <button class="brand" data-view="chat" aria-label="Abrir chat">
-        <span class="brand-mark">V</span>
-        <span><b>VYRON</b><small>AI SOFTWARE ENGINEER</small></span>
-      </button>
-
-      <div class="system-pulse">
-        <span class="dot online"></span>
-        <span>CORE <b>ONLINE</b></span>
-        <span class="hide-mobile">MODE <b id="modeLabel">AUTO</b></span>
+    <aside class="sidebar conversations-panel">
+      <div class="panel-head">
+        <span>CONVERSAS</span>
+        <button id="newSessionMini" class="tiny-icon" aria-label="Nova sessão">＋</button>
       </div>
-
-      <div class="top-actions">
-        <button class="ghost" id="newChatBtn">+ NOVA SESSÃO</button>
-        <button class="icon-btn" id="settingsBtn" title="Configurações">⚙</button>
-      </div>
-    </header>
-
-    <aside class="sidebar">
-      <nav class="main-nav" aria-label="Navegação principal">
-        <button class="nav-item active" data-view="chat"><span>⌁</span><b>CHAT</b></button>
-        <button class="nav-item" data-view="projects"><span>▦</span><b>PROJETOS</b></button>
-        <button class="nav-item" data-view="knowledge"><span>◫</span><b>KNOWLEDGE</b></button>
-        <button class="nav-item" data-view="memory"><span>◇</span><b>MEMÓRIA</b></button>
-        <button class="nav-item" data-view="activity"><span>⌘</span><b>ATIVIDADE</b></button>
-      </nav>
-
-      <div class="sidebar-section">
-        <div class="section-label">SESSÕES</div>
-        <div id="sessionList" class="session-list"></div>
-      </div>
-
-      <div class="sidebar-bottom">
-        <div class="mini-status"><span>MODEL</span><b id="modelMini">DEMO CORE</b></div>
-        <div class="mini-status"><span>MEMORY</span><b id="memoryMini">LOCAL</b></div>
-        <button class="account-card" id="accountBtn"><span class="avatar">R</span><span><b>OPERADOR</b><small>LOCAL WORKSPACE</small></span></button>
+      <nav id="sessionList" class="session-list"></nav>
+      <div class="sidebar-footer">
+        <button class="account-row"><span class="user-icon">♙</span><span>Conta</span></button>
       </div>
     </aside>
 
     <main class="workspace">
-      <section class="view active" id="view-chat">
-        <div class="chat-layout">
-          <div class="chat-main">
-            <div class="chat-head">
-              <div>
-                <p class="eyebrow">VYRON // INTERACTIVE CORE</p>
-                <h1 id="chatTitle">O que vamos construir?</h1>
-              </div>
-              <div class="mode-switch" id="modeSwitch">
-                <button class="active" data-mode="AUTO">AUTO</button>
-                <button data-mode="CODE">CODE</button>
-                <button data-mode="DEBUG">DEBUG</button>
-                <button data-mode="BUILD">BUILD</button>
-                <button data-mode="ARCHITECT">ARCH</button>
-              </div>
-            </div>
-
-            <div class="messages" id="messages"></div>
-
-            <div class="suggestions" id="suggestions">
-              <button data-prompt="Analise este projeto e encontre possíveis bugs sem alterar o que já funciona."><b>ANALISAR PROJETO</b><small>Encontre bugs e dependências.</small></button>
-              <button data-prompt="Quero criar um site completo. Me ajude a definir a melhor arquitetura."><b>CRIAR SITE</b><small>Frontend, backend e banco.</small></button>
-              <button data-prompt="Tenho um erro no meu código. Quero encontrar a causa raiz e corrigir."><b>DEBUG</b><small>Diagnóstico antes da correção.</small></button>
-            </div>
-
-            <div class="composer-wrap">
-              <div class="attachment-row" id="attachmentRow"></div>
-              <div class="composer">
-                <button class="attach-btn" id="attachBtn" title="Adicionar arquivos">＋</button>
-                <textarea id="promptInput" rows="1" placeholder="Descreva um problema, cole código ou envie seu projeto..."></textarea>
-                <div class="composer-tools">
-                  <button class="tool-toggle active" id="webToggle" title="Pesquisa web">WEB</button>
-                  <button class="tool-toggle active" id="memoryToggle" title="Memória">MEM</button>
-                  <button class="send-btn" id="sendBtn" title="Enviar">↑</button>
-                </div>
-              </div>
-              <div class="composer-foot"><span>ENTER para enviar · SHIFT+ENTER nova linha</span><span id="contextMeter">CONTEXT 0%</span></div>
-              <input type="file" id="fileInput" multiple hidden accept=".zip,.js,.ts,.jsx,.tsx,.html,.css,.json,.md,.txt,.py,.php,.java,.c,.cpp,.cs,.go,.rs,.sql,.xml,.yml,.yaml" />
-            </div>
-          </div>
-
-          <aside class="inspector" id="inspector">
-            <div class="inspector-head"><span>PROJECT CONTEXT</span><button id="collapseInspector">×</button></div>
-            <div class="drop-zone" id="dropZone">
-              <b>DROP PROJECT HERE</b>
-              <span>ZIP, JS, TS, HTML, CSS, PY, PHP, SQL...</span>
-            </div>
-            <div class="panel-block">
-              <div class="panel-title">FILES <span id="fileCount">0</span></div>
-              <div class="file-tree" id="fileTree"><div class="empty">Nenhum arquivo carregado.</div></div>
-            </div>
-            <div class="panel-block">
-              <div class="panel-title">DETECTED STACK</div>
-              <div class="chips" id="stackChips"><span>WAITING</span></div>
-            </div>
-            <div class="panel-block stats-grid">
-              <div><small>MEMORIES</small><b id="memoryCountSide">0</b></div>
-              <div><small>SOURCES</small><b id="sourceCountSide">0</b></div>
-              <div><small>SOLVED</small><b id="solvedCountSide">0</b></div>
-              <div><small>CONFIDENCE</small><b id="confidenceSide">—</b></div>
-            </div>
-          </aside>
+      <section id="welcomeView" class="welcome-view">
+        <div class="hero-copy">
+          <div class="eyebrow">VYRON // INTERACTIVE CORE</div>
+          <h1>O que vamos <em>construir?</em></h1>
+          <p>Descreva seu problema, cole seu código ou envie seu projeto.<br>Eu vou analisar, planejar e construir com você.</p>
         </div>
-      </section>
 
-      <section class="view dashboard-view" id="view-projects">
-        <div class="page-head"><p class="eyebrow">WORKSPACE</p><h2>Projetos</h2><p>Contextos independentes para cada código, stack e histórico de decisões.</p></div>
-        <div class="action-row"><button class="primary" id="createProjectBtn">+ NOVO PROJETO</button><button class="secondary" id="importProjectBtn">IMPORTAR ZIP</button></div>
-        <div class="card-grid" id="projectGrid"></div>
-      </section>
-
-      <section class="view dashboard-view" id="view-knowledge">
-        <div class="page-head"><p class="eyebrow">VYRON KNOWLEDGE ENGINE</p><h2>Conhecimento</h2><p>Base técnica recuperável por busca semântica. O backend poderá alimentar esta área com fontes permitidas e documentação oficial.</p></div>
-        <div class="knowledge-top">
-          <div class="metric-card"><small>DOCUMENTOS</small><b id="knowledgeDocs">0</b><span>indexados</span></div>
-          <div class="metric-card"><small>FONTES</small><b id="knowledgeSources">0</b><span>confiáveis</span></div>
-          <div class="metric-card"><small>VERIFICADAS</small><b id="knowledgeVerified">0</b><span>soluções</span></div>
-          <div class="metric-card"><small>QUEUE</small><b id="knowledgeQueue">3</b><span>tópicos</span></div>
-        </div>
-        <div class="two-col">
-          <div class="panel-card">
-            <div class="panel-card-head"><b>LEARNING QUEUE</b><span>AUTO DISCOVERY</span></div>
-            <div class="queue-list" id="learningQueue"></div>
-          </div>
-          <div class="panel-card">
-            <div class="panel-card-head"><b>SOURCE POLICY</b><span>SAFE INGESTION</span></div>
-            <div class="policy-list">
-              <div><span class="ok">●</span><b>Documentação oficial</b><small>prioridade máxima</small></div>
-              <div><span class="ok">●</span><b>Changelogs / RFCs</b><small>versionamento e padrões</small></div>
-              <div><span class="warn">●</span><b>Fontes comunitárias</b><small>exigem validação</small></div>
-              <div><span class="bad">●</span><b>Bloqueado / restrito</b><small>não ingerir</small></div>
+        <div class="composer-wrap">
+          <div id="dropOverlay" class="drop-overlay">SOLTE O PROJETO AQUI</div>
+          <textarea id="promptInput" rows="5" placeholder="Descreva seu problema, cole código ou envie seu projeto..."></textarea>
+          <div class="composer-actions">
+            <div class="left-actions">
+              <label class="attach-btn">⌕ <span>Anexar</span><input id="fileInput" type="file" multiple hidden></label>
+              <button id="clearContextBtn" class="ghost-btn">Limpar contexto</button>
+            </div>
+            <div class="right-actions">
+              <div class="mode-switch" role="tablist" aria-label="Modo">
+                <button class="mode-btn active" data-mode="AUTO">AUTO</button>
+                <button class="mode-btn" data-mode="DEBUG">DEBUG</button>
+                <button class="mode-btn" data-mode="BUILD">BUILD</button>
+              </div>
+              <button id="sendBtn" class="send-btn" aria-label="Enviar">➤</button>
             </div>
           </div>
         </div>
+
+        <div class="engine-strip">
+          <div><span></span> VYRON AI ENGINE <span></span></div>
+          <small>ANÁLISE · PLANEJAMENTO · IMPLEMENTAÇÃO</small>
+        </div>
       </section>
 
-      <section class="view dashboard-view" id="view-memory">
-        <div class="page-head"><p class="eyebrow">LONG-TERM CONTEXT</p><h2>Memória</h2><p>Preferências, decisões e conhecimento por projeto. Nesta versão são salvos localmente no navegador.</p></div>
-        <div class="action-row"><button class="primary" id="addMemoryBtn">+ ADICIONAR MEMÓRIA</button><button class="secondary" id="clearMemoryBtn">LIMPAR LOCAIS</button></div>
-        <div class="memory-list" id="memoryList"></div>
-      </section>
-
-      <section class="view dashboard-view" id="view-activity">
-        <div class="page-head"><p class="eyebrow">SYSTEM TRACE</p><h2>Atividade</h2><p>Eventos do workspace e do motor de resolução.</p></div>
-        <div class="terminal-card"><div class="terminal-head"><span>VYRON://TRACE</span><button id="clearActivityBtn">CLEAR</button></div><div class="terminal-body" id="activityLog"></div></div>
+      <section id="chatView" class="chat-view hidden">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-composer">
+          <textarea id="chatInput" rows="2" placeholder="Continue a conversa..."></textarea>
+          <div class="chat-composer-bottom">
+            <label class="attach-btn compact">⌕ <span>Anexar</span><input id="chatFileInput" type="file" multiple hidden></label>
+            <div class="mode-switch compact-switch" role="tablist">
+              <button class="mode-btn active" data-mode="AUTO">AUTO</button>
+              <button class="mode-btn" data-mode="DEBUG">DEBUG</button>
+              <button class="mode-btn" data-mode="BUILD">BUILD</button>
+            </div>
+            <button id="chatSendBtn" class="send-btn small">➤</button>
+          </div>
+        </div>
       </section>
     </main>
+
+    <aside class="sidebar project-panel">
+      <section class="project-block">
+        <div class="project-title">▱ &nbsp; PROJETO ATUAL</div>
+        <div id="projectCard" class="project-card">
+          <div class="project-icon">▰</div>
+          <div class="project-info">
+            <strong id="projectName">Nenhum projeto</strong>
+            <small id="projectPath">anexe arquivos ou crie um projeto</small>
+          </div>
+          <button class="ellipsis">•••</button>
+        </div>
+      </section>
+
+      <section class="project-block files-block">
+        <div class="section-title"><span>ARQUIVOS</span><small id="fileCount">0</small></div>
+        <div id="fileList" class="file-list"><p class="muted">Nenhum arquivo carregado.</p></div>
+      </section>
+
+      <section class="project-block stack-block">
+        <div class="section-title"><span>STACK</span></div>
+        <div id="stackTags" class="stack-tags"><span class="tag muted-tag">AGUARDANDO</span></div>
+      </section>
+
+      <section class="project-block status-block">
+        <div class="section-title"><span>CONTEXTO</span></div>
+        <div class="mini-stats">
+          <div><small>ARQUIVOS</small><strong id="statFiles">0</strong></div>
+          <div><small>MODO</small><strong id="statMode">AUTO</strong></div>
+        </div>
+      </section>
+    </aside>
   </div>
 
-  <dialog class="modal" id="settingsModal">
-    <form method="dialog" class="modal-card">
-      <div class="modal-head"><div><p class="eyebrow">SYSTEM</p><h3>Configurações</h3></div><button value="cancel">×</button></div>
-      <label>Endpoint do backend<input id="apiEndpoint" placeholder="https://seu-backend.vercel.app/api/chat" /></label>
-      <label>Modelo / alias<input id="modelName" placeholder="VYRON CORE" /></label>
-      <label class="switch-row"><span><b>Pesquisa web</b><small>Permitir pesquisa atual quando suportada pelo backend.</small></span><input id="settingWeb" type="checkbox" checked /></label>
-      <label class="switch-row"><span><b>Memória</b><small>Usar contexto local ao montar solicitações.</small></span><input id="settingMemory" type="checkbox" checked /></label>
-      <p class="security-note">Não coloque chave de API aqui. Chaves devem permanecer no backend.</p>
-      <div class="modal-actions"><button value="cancel" class="secondary">CANCELAR</button><button value="default" class="primary" id="saveSettingsBtn">SALVAR</button></div>
-    </form>
-  </dialog>
+  <div id="projectModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="modal-close" data-close="projectModal">×</button>
+      <span class="modal-kicker">NOVO PROJETO</span>
+      <h2>Criar workspace</h2>
+      <label>Nome do projeto<input id="newProjectName" type="text" placeholder="meu-projeto"></label>
+      <button id="createProjectBtn" class="btn btn-primary">CRIAR PROJETO</button>
+    </div>
+  </div>
 
-  <dialog class="modal" id="memoryModal">
-    <form method="dialog" class="modal-card small">
-      <div class="modal-head"><div><p class="eyebrow">MEMORY</p><h3>Nova memória</h3></div><button value="cancel">×</button></div>
-      <label>Título<input id="memoryTitleInput" placeholder="Ex.: Preferência de edição" /></label>
-      <label>Conteúdo<textarea id="memoryContentInput" rows="5" placeholder="Ex.: Preserve o design existente quando corrigir bugs."></textarea></label>
-      <div class="modal-actions"><button value="cancel" class="secondary">CANCELAR</button><button value="default" class="primary" id="saveMemoryBtn">SALVAR</button></div>
-    </form>
-  </dialog>
+  <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card settings-card">
+      <button class="modal-close" data-close="settingsModal">×</button>
+      <span class="modal-kicker">CONFIGURAÇÕES</span>
+      <h2>VYRON Core</h2>
+      <div class="setting-row"><div><strong>Backend</strong><small>Endpoint usado futuramente para conectar a IA real.</small></div><span class="status-pill">DEMO</span></div>
+      <div class="setting-row"><div><strong>Memória local</strong><small>Sessões e projeto ficam salvos neste navegador.</small></div><span class="status-pill green">ATIVA</span></div>
+      <button id="resetDataBtn" class="btn danger">RESETAR DADOS LOCAIS</button>
+    </div>
+  </div>
 
   <script src="assets/app.js"></script>
 </body>
