@@ -1,1187 +1,203 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VYRON // BUILD YOUR INTELLIGENCE</title>
-<meta name="description" content="VYRON — interface de inteligência artificial em desenvolvimento.">
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
-:root{
-  --bg:#050505;
-  --text:#e8e8e8;
-  --muted:#777;
-  --line:rgba(255,255,255,.12);
-  --accent:#b8ff00;
-}
-
-*{box-sizing:border-box;margin:0;padding:0}
-
-html{scroll-behavior:smooth}
-
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:"IBM Plex Mono",monospace;
-  overflow-x:hidden;
-}
-
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:20;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:42px 42px;
-  mask-image:linear-gradient(to bottom,black,transparent 85%);
-}
-
-.scanlines{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:50;
-  background:repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 3px,
-    rgba(255,255,255,.018) 4px
-  );
-}
-
-/* FALLING CODE BACKGROUND */
-#codeRain{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:1;
-  pointer-events:none;
-  opacity:.72;
-  mix-blend-mode:screen;
-}
-
-/* BOOT */
-.boot{
-  position:fixed;inset:0;z-index:9999;overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 46%,rgba(15,125,160,.10),transparent 32%),
-    radial-gradient(circle at 72% 60%,rgba(160,0,220,.07),transparent 30%),
-    #020405;
-  display:flex;align-items:center;justify-content:center;
-  transition:opacity .9s cubic-bezier(.77,0,.18,1),visibility .9s;
-}
-.boot.hidden{opacity:0;visibility:hidden}
-.boot-grid{
-  position:absolute;inset:-20%;
-  background-image:
-    linear-gradient(rgba(40,220,255,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(40,220,255,.045) 1px,transparent 1px);
-  background-size:55px 55px;
-  transform:perspective(700px) rotateX(62deg) scale(1.35);
-  transform-origin:center bottom;
-  animation:bootGridMove 7s linear infinite;
-  opacity:.6;
-}
-@keyframes bootGridMove{
-  from{background-position:0 0,0 0}
-  to{background-position:0 55px,55px 0}
-}
-.boot-noise{
-  position:absolute;inset:0;opacity:.15;pointer-events:none;
-  background:repeating-linear-gradient(
-    to bottom,transparent 0,transparent 3px,rgba(255,255,255,.035) 4px
-  );
-}
-.boot-center{
-  position:relative;z-index:3;width:min(860px,88vw);
-  animation:bootCenterIn 1.1s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes bootCenterIn{
-  from{opacity:0;transform:scale(.94) translateY(18px);filter:blur(8px)}
-  to{opacity:1;transform:none;filter:none}
-}
-.boot-brand{display:flex;align-items:center;gap:18px}
-.boot-mark{
-  width:38px;height:38px;position:relative;border:1px solid rgba(39,220,255,.7);
-  transform:skew(-12deg);box-shadow:0 0 22px rgba(0,210,255,.14);
-}
-.boot-mark span{
-  position:absolute;left:7px;right:7px;height:1px;
-  background:#27dcff;box-shadow:0 0 8px #27dcff;
-}
-.boot-mark span:nth-child(1){top:9px}
-.boot-mark span:nth-child(2){top:18px;width:70%}
-.boot-mark span:nth-child(3){top:27px;width:45%}
-.boot-wordmark{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:clamp(2.7rem,7vw,5.5rem);
-  font-weight:700;letter-spacing:-.08em;color:#e9f8ff;
-  text-shadow:0 0 28px rgba(20,210,255,.2);
-}
-.boot-wordmark span{color:#22d9ff}
-/* VYRON GLITCH / HANDSHAKE LOGO ANIMATION */
-.glitch-logo{
-  position:relative;
-  isolation:isolate;
-  display:inline-block;
-  min-width:8.2ch;
-  color:#f2fbff;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.9),
-    0 0 22px rgba(30,210,255,.35);
-  animation:
-    logoJolt 3.7s steps(1,end) infinite,
-    logoGlow 2.4s ease-in-out infinite;
-}
-
-.glitch-layer,
-.glitch-slice{
-  display:block;
-  white-space:nowrap;
-}
-
-.glitch-layer{
-  position:relative;
-}
-
-.glitch-base{
-  position:relative;
-  z-index:4;
-}
-
-.glitch-cyan,
-.glitch-magenta{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:0;
-}
-
-.glitch-cyan{
-  z-index:3;
-  color:#28e7ff;
-  text-shadow:0 0 18px rgba(40,231,255,.8);
-  animation:glitchCyan 3.7s steps(1,end) infinite;
-}
-
-.glitch-magenta{
-  z-index:2;
-  color:#ff2bd6;
-  text-shadow:0 0 18px rgba(255,43,214,.75);
-  animation:glitchMagenta 3.7s steps(1,end) infinite;
-}
-
-.glitch-slice{
-  position:absolute;
-  left:0;
-  top:0;
-  z-index:5;
-  pointer-events:none;
-  color:#f4fbff;
-  opacity:0;
-  clip-path:inset(0 0 0 0);
-}
-
-.slice-a{
-  animation:glitchSliceA 3.7s steps(1,end) infinite;
-}
-
-.slice-b{
-  animation:glitchSliceB 3.7s steps(1,end) infinite;
-}
-
-.slice-c{
-  animation:glitchSliceC 3.7s steps(1,end) infinite;
-}
-
-.glitch-logo::before,
-.glitch-logo::after{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  z-index:6;
-  opacity:0;
-}
-
-.glitch-logo::before{
-  width:8px;
-  height:8px;
-  right:15%;
-  top:24%;
-  background:#fff;
-  box-shadow:
-    18px 7px 0 #fff,
-    35px -5px 0 #fff,
-    4px 27px 0 #fff,
-    25px 36px 0 #fff,
-    -5px 43px 0 rgba(255,255,255,.8);
-  animation:pixelBurst 3.7s steps(1,end) infinite;
-}
-
-.glitch-logo::after{
-  left:-7%;
-  right:-7%;
-  top:49%;
-  height:2px;
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(35,220,255,.9) 20%,
-    rgba(255,255,255,.9) 50%,
-    rgba(255,43,214,.8) 80%,
-    transparent
-  );
-  box-shadow:0 0 18px rgba(35,220,255,.55);
-  animation:scanSlash 3.7s steps(1,end) infinite;
-}
-
-@keyframes logoJolt{
-  0%,72%,100%{transform:translate(0,0) skewX(0)}
-  73%{transform:translate(-3px,0) skewX(-2deg)}
-  74%{transform:translate(4px,-1px) skewX(2deg)}
-  75%{transform:translate(-1px,1px) skewX(0)}
-  76%{transform:translate(0,0)}
-  88%{transform:translate(2px,0)}
-  89%{transform:translate(0,0)}
-}
-
-@keyframes logoGlow{
-  0%,100%{filter:brightness(1)}
-  75%{filter:brightness(1.22)}
-  76%{filter:brightness(1)}
-}
-
-@keyframes glitchCyan{
-  0%,70%,100%{
-    opacity:0;
-    transform:translate(0,0);
-    clip-path:inset(0 0 0 0);
-  }
-  72%{
-    opacity:.9;
-    transform:translate(-7px,0);
-    clip-path:inset(18% 0 57% 0);
-  }
-  73%{
-    opacity:.75;
-    transform:translate(8px,0);
-    clip-path:inset(55% 0 22% 0);
-  }
-  74%{
-    opacity:0;
-    transform:none;
-  }
-  87%{
-    opacity:.75;
-    transform:translate(-5px,0);
-    clip-path:inset(68% 0 13% 0);
-  }
-  88%{
-    opacity:0;
-  }
-}
-
-@keyframes glitchMagenta{
-  0%,70%,100%{
-    opacity:0;
-    transform:translate(0,0);
-    clip-path:inset(0 0 0 0);
-  }
-  72%{
-    opacity:.8;
-    transform:translate(8px,1px);
-    clip-path:inset(50% 0 30% 0);
-  }
-  73%{
-    opacity:.65;
-    transform:translate(-9px,0);
-    clip-path:inset(13% 0 69% 0);
-  }
-  74%{
-    opacity:0;
-  }
-  87%{
-    opacity:.7;
-    transform:translate(6px,0);
-    clip-path:inset(28% 0 55% 0);
-  }
-  88%{
-    opacity:0;
-  }
-}
-
-@keyframes glitchSliceA{
-  0%,68%,100%{
-    opacity:0;
-    transform:none;
-  }
-  70%{
-    opacity:1;
-    transform:translate(-22px,-4px);
-    clip-path:inset(4% 0 78% 0);
-  }
-  71%{
-    opacity:0;
-  }
-}
-
-@keyframes glitchSliceB{
-  0%,68%,100%{
-    opacity:0;
-    transform:none;
-  }
-  70.5%{
-    opacity:1;
-    transform:translate(26px,3px);
-    clip-path:inset(38% 0 43% 0);
-  }
-  71.5%{
-    opacity:0;
-  }
-}
-
-@keyframes glitchSliceC{
-  0%,68%,100%{
-    opacity:0;
-    transform:none;
-  }
-  72%{
-    opacity:1;
-    transform:translate(-15px,5px);
-    clip-path:inset(73% 0 8% 0);
-  }
-  73%{
-    opacity:0;
-  }
-}
-
-@keyframes pixelBurst{
-  0%,68%,100%{
-    opacity:0;
-    transform:translate(0,0) scale(.7);
-  }
-  70%{
-    opacity:1;
-    transform:translate(20px,-4px) scale(1);
-  }
-  71%{
-    opacity:.7;
-    transform:translate(38px,8px);
-  }
-  72%{
-    opacity:0;
-  }
-}
-
-@keyframes scanSlash{
-  0%,68%,100%{
-    opacity:0;
-    transform:translateX(-120%) scaleX(.2);
-  }
-  70%{
-    opacity:.9;
-    transform:translateX(0) scaleX(1);
-  }
-  71%{
-    opacity:0;
-    transform:translateX(120%) scaleX(.5);
-  }
-}
-
-.boot-subtitle{
-  margin-top:14px;padding-left:56px;color:#27d9ff;
-  font-size:10px;letter-spacing:.25em;
-}
-.boot-terminal{
-  margin-top:55px;border-left:1px solid rgba(35,215,255,.5);
-  padding:14px 0 14px 18px;color:#778890;
-  font-size:10px;line-height:2.05;text-transform:uppercase;
-}
-.boot-terminal div{opacity:0;animation:bootLine .35s forwards}
-.boot-terminal div:nth-child(1){animation-delay:.35s}
-.boot-terminal div:nth-child(2){animation-delay:.75s}
-.boot-terminal div:nth-child(3){animation-delay:1.15s}
-.boot-terminal div:nth-child(4){animation-delay:1.55s}
-.boot-terminal div:nth-child(5){animation-delay:1.95s}
-@keyframes bootLine{to{opacity:1}}
-.boot-dim{color:#405159}
-.boot-green{color:#9dff59;text-shadow:0 0 12px rgba(157,255,89,.25)}
-.boot-progress-wrap{margin-top:28px}
-.boot-progress-meta{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:9px;color:#4d6871;font-size:9px;letter-spacing:.15em;
-}
-#bootStatus{color:#27d9ff}
-#bootPercent{color:#8deaff;min-width:35px;text-align:right}
-.boot-progress-track{
-  width:100%;height:2px;background:rgba(100,170,190,.12);
-  overflow:hidden;position:relative;
-}
-.boot-progress{
-  width:0%;height:100%;
-  background:linear-gradient(90deg,#087b99,#27dcff,#b8ff00);
-  box-shadow:0 0 8px rgba(39,220,255,.75),0 0 25px rgba(39,220,255,.25);
-}
-.boot-progress-track::after{
-  content:"";position:absolute;top:-3px;bottom:-3px;width:90px;left:-100px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);
-  animation:bootScanner 1.5s linear infinite;
-}
-@keyframes bootScanner{to{left:100%}}
-.boot-footer{
-  margin-top:65px;padding-top:13px;border-top:1px solid rgba(255,255,255,.08);
-  display:flex;justify-content:space-between;gap:15px;color:#39484e;
-  font-size:8px;letter-spacing:.12em;
-}
-.boot-corner{position:absolute;width:45px;height:45px;opacity:.65}
-.boot-corner::before,.boot-corner::after{
-  content:"";position:absolute;background:#27dcff;
-}
-.boot-corner::before{width:100%;height:1px}
-.boot-corner::after{width:1px;height:100%}
-.boot-corner-tl{top:28px;left:28px}
-.boot-corner-tr{top:28px;right:28px;transform:scaleX(-1)}
-.boot-corner-bl{bottom:28px;left:28px;transform:scaleY(-1)}
-.boot-corner-br{bottom:28px;right:28px;transform:scale(-1)}
-.boot-skip{
-  position:absolute;bottom:25px;left:50%;transform:translateX(-50%);
-  z-index:4;color:#3d535a;font-size:8px;letter-spacing:.18em;
-}
-.boot-skip strong{color:#6f929d}
-@media(max-width:700px){
-  .boot-center{width:86vw}
-  .boot-subtitle{padding-left:0;font-size:8px}
-  .boot-terminal{margin-top:35px;font-size:8px}
-  .boot-footer{margin-top:40px;flex-wrap:wrap}
-  .boot-mark{width:30px;height:30px}
-  .boot-wordmark{font-size:3rem}
-}
-/* NAV */
-.nav{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:100;
-  height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 4vw;
-  border-bottom:1px solid var(--line);
-  background:rgba(5,5,5,.72);
-  backdrop-filter:blur(15px);
-}
-.logo{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:24px;
-  font-weight:700;
-  letter-spacing:-.06em;
-}
-.logo span{color:var(--accent)}
-.nav-right{display:flex;gap:28px;font-size:10px;color:#777}
-.status{display:flex;align-items:center;gap:7px}
-.status-dot{
-  width:6px;
-  height:6px;
-  background:var(--accent);
-  border-radius:50%;
-  box-shadow:0 0 12px var(--accent);
-}
-
-/* MAIN / HERO */
-main{position:relative;z-index:5}
-.hero{
-  min-height:100vh;
-  padding:150px 4vw 80px;
-  display:grid;
-  grid-template-columns:1.4fr .6fr;
-  gap:5vw;
-  align-items:center;
-}
-.eyebrow{
-  font-size:11px;
-  color:var(--accent);
-  margin-bottom:25px;
-  letter-spacing:.08em;
-}
-.hero h1{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:clamp(4rem,11vw,12rem);
-  line-height:.8;
-  letter-spacing:-.09em;
-  max-width:1000px;
-}
-.hero h1 .outline{
-  color:transparent;
-  -webkit-text-stroke:1px #555;
-}
-.hero-description{
-  max-width:580px;
-  margin-top:38px;
-  font-size:14px;
-  line-height:1.8;
-  color:#999;
-}
-.hero-actions{margin-top:38px;display:flex;gap:12px;flex-wrap:wrap}
-.button{
-  border:1px solid #444;
-  background:#111;
-  color:white;
-  padding:14px 20px;
-  font-family:inherit;
-  font-size:11px;
-  cursor:pointer;
-  transition:background .2s,border-color .2s,color .2s,transform .2s;
-}
-.button:hover{
-  background:var(--accent);
-  color:#050505;
-  border-color:var(--accent);
-  transform:translateY(-2px);
-}
-.button.primary{
-  background:var(--accent);
-  color:#050505;
-  border-color:var(--accent);
-}
-
-/* HUD */
-.hud{border:1px solid var(--line);background:rgba(10,10,10,.75)}
-.hud-header{
-  padding:13px 15px;
-  border-bottom:1px solid var(--line);
-  font-size:9px;
-  color:#777;
-  display:flex;
-  justify-content:space-between;
-}
-.hud-body{padding:20px}
-.avatar{
-  width:75px;
-  height:75px;
-  border:1px solid #444;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:"Space Grotesk",sans-serif;
-  font-size:30px;
-  margin-bottom:20px;
-}
-.hud-name{font-size:16px;font-weight:600}
-.hud-level{font-size:9px;color:#666;margin-top:5px}
-.stat{margin-top:22px}
-.stat-top{
-  display:flex;
-  justify-content:space-between;
-  font-size:9px;
-  color:#777;
-  margin-bottom:7px;
-}
-.stat-bar{height:3px;background:#1b1b1b}
-.stat-fill{
-  height:100%;
-  background:var(--accent);
-  box-shadow:0 0 12px rgba(184,255,0,.35);
-}
-
-/* SECTION */
-.section{
-  padding:120px 4vw;
-  border-top:1px solid var(--line);
-}
-.section-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  margin-bottom:55px;
-}
-.section-number{color:#555;font-size:11px}
-.section-title{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:clamp(3rem,7vw,8rem);
-  line-height:.85;
-  letter-spacing:-.07em;
-}
-.section-title span{color:var(--accent)}
-
-/* PROJECTS */
-.projects{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:1px;
-  background:var(--line);
-  border:1px solid var(--line);
-}
-.project{
-  min-height:360px;
-  padding:30px;
-  background:var(--bg);
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  position:relative;
-  overflow:hidden;
-  transition:background .3s;
-}
-.project:hover{background:#0d0d0d}
-.project::after{
-  content:"";
-  position:absolute;
-  width:180px;
-  height:180px;
-  right:-70px;
-  bottom:-70px;
-  border:1px solid rgba(184,255,0,.2);
-  border-radius:50%;
-  transition:transform .5s;
-}
-.project:hover::after{transform:scale(1.5)}
-.project-top{
-  display:flex;
-  justify-content:space-between;
-  color:#666;
-  font-size:10px;
-}
-.project-icon{font-size:38px;margin-bottom:20px}
-.project h3{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:42px;
-  letter-spacing:-.06em;
-}
-.project p{
-  max-width:450px;
-  color:#777;
-  font-size:12px;
-  line-height:1.8;
-  margin-top:15px;
-}
-.project-link{
-  color:var(--accent);
-  font-size:10px;
-  margin-top:30px;
-}
-
-/* TERMINAL */
-.terminal{border:1px solid var(--line);background:#030303}
-.terminal-top{
-  height:40px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 15px;
-  font-size:9px;
-  color:#666;
-}
-.terminal-dots{display:flex;gap:5px}
-.terminal-dots span{
-  width:6px;height:6px;background:#333;border-radius:50%;
-}
-.terminal-body{
-  padding:30px;
-  min-height:280px;
-  font-size:12px;
-  line-height:2;
-  color:#777;
-}
-.terminal-body .green{color:var(--accent)}
-.cursor{
-  display:inline-block;
-  width:7px;
-  height:13px;
-  background:var(--accent);
-  animation:blink .8s infinite;
-  vertical-align:middle;
-}
-@keyframes blink{50%{opacity:0}}
-
-/* SIGNAL */
-.signal{
-  overflow:hidden;
-  border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-  white-space:nowrap;
-}
-.signal-track{
-  display:inline-flex;
-  gap:50px;
-  padding:18px 0;
-  animation:ticker 28s linear infinite;
-}
-.signal-item{font-size:10px;color:#777}
-.signal-item strong{color:var(--accent)}
-@keyframes ticker{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
-}
-
-/* FOOTER */
-footer{
-  padding:80px 4vw 35px;
-  border-top:1px solid var(--line);
-}
-.footer-main{
-  display:flex;
-  justify-content:space-between;
-  gap:30px;
-  align-items:flex-end;
-}
-.footer-logo{
-  font-family:"Space Grotesk",sans-serif;
-  font-size:clamp(4rem,13vw,15rem);
-  letter-spacing:-.1em;
-  line-height:.7;
-}
-.footer-right{text-align:right;color:#555;font-size:10px;line-height:1.8}
-.footer-bottom{
-  margin-top:80px;
-  padding-top:18px;
-  border-top:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  font-size:9px;
-  color:#444;
-}
-
-/* RESPONSIVE */
-@media(max-width:850px){
-  .nav{height:62px}
-  .nav-right{display:none}
-  .hero{
-    grid-template-columns:1fr;
-    padding-top:120px;
-  }
-  .hud{max-width:500px}
-  .projects{grid-template-columns:1fr}
-  .section-header{display:block}
-  .section-number{margin-bottom:20px}
-  .footer-main{display:block}
-  .footer-right{text-align:left;margin-top:40px}
-  .footer-bottom{display:block}
-  .footer-bottom span{display:block;margin-top:8px}
-}
-
-.site-nav{display:flex;align-items:center;gap:20px;margin-left:auto;margin-right:28px}
-.site-nav a{color:#66757b;text-decoration:none;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.12em;transition:color .2s,text-shadow .2s}
-.site-nav a:hover{color:#27dcff;text-shadow:0 0 10px rgba(39,220,255,.5)}
-@media(max-width:980px){.site-nav{display:none}}
-
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#070908" />
+  <title>VYRON AI // Software Engineer</title>
+  <meta name="description" content="VYRON AI — workspace inteligente para programação, debugging, arquitetura e desenvolvimento web." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css" />
 </head>
-
 <body>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
 
-<canvas id="codeRain" aria-hidden="true"></canvas>
-<div class="scanlines"></div>
-
-<div class="boot" id="boot">
-  <div class="boot-grid"></div>
-  <div class="boot-noise"></div>
-  <div class="boot-corner boot-corner-tl"></div>
-  <div class="boot-corner boot-corner-tr"></div>
-  <div class="boot-corner boot-corner-bl"></div>
-  <div class="boot-corner boot-corner-br"></div>
-
-  <div class="boot-center">
-    <div class="boot-brand">
-      <div class="boot-mark"><span></span><span></span><span></span></div>
-      <div class="boot-wordmark glitch-logo" id="glitchLogo" aria-label="VYRON">
-  <span class="glitch-layer glitch-base">VYRON<span>.</span></span>
-  <span class="glitch-layer glitch-cyan">VYRON<span>.</span></span>
-  <span class="glitch-layer glitch-magenta">VYRON<span>.</span></span>
-  <span class="glitch-slice slice-a">VYRON<span>.</span></span>
-  <span class="glitch-slice slice-b">VYRON<span>.</span></span>
-  <span class="glitch-slice slice-c">VYRON<span>.</span></span>
-</div>
-    </div>
-
-    <div class="boot-subtitle">DIGITAL SYSTEMS // GLOBAL NODE</div>
-
-    <div class="boot-terminal" id="bootTerminal">
-      <div><span class="boot-dim">[00:01]</span> establishing secure channel...</div>
-      <div><span class="boot-dim">[00:02]</span> connecting to VYRON core...</div>
-      <div><span class="boot-dim">[00:03]</span> loading AI interface...</div>
-      <div><span class="boot-dim">[00:04]</span> preparing neural endpoint...</div>
-      <div><span class="boot-green">[00:05] SYSTEM LINK ESTABLISHED</span></div>
-    </div>
-
-    <div class="boot-progress-wrap">
-      <div class="boot-progress-meta">
-        <span id="bootStatus">// INITIALIZING</span>
-        <span id="bootPercent">000%</span>
+  <div class="boot" id="boot">
+    <div class="boot-core">
+      <div class="boot-logo"><span>V</span></div>
+      <div>
+        <strong>VYRON AI</strong>
+        <small>SOFTWARE ENGINEER CORE</small>
       </div>
-      <div class="boot-progress-track">
-        <div class="boot-progress" id="bootProgress"></div>
-      </div>
-    </div>
-
-    <div class="boot-footer">
-      <span>VX/01</span>
-      <span>VYRON AI</span>
-      <span>BUILD YOUR INTELLIGENCE</span>
+      <div class="boot-log" id="bootLog"></div>
+      <div class="boot-bar"><i id="bootBar"></i></div>
     </div>
   </div>
 
-  <div class="boot-skip">PRESS <strong>SPACE</strong> TO SKIP</div>
-</div>
-</div>
-
-<header class="nav">
-  <div class="logo">VYRON<span>.</span></div>
-
-  <div class="nav-right">
-    <div class="status">
-      <span class="status-dot"></span>
-      SYSTEM ONLINE
-    </div>
-    <span>VX/01</span>
-    <span id="clock">00:00:00</span>
-  </div>
-</header>
-
-<main>
-
-<section class="hero">
-  <div>
-    <div class="eyebrow">// VYRON AI · NEURAL INTERFACE</div>
-
-    <h1>
-      BUILD<br>
-      <span class="outline">YOUR</span><br>
-      INTELLIGENCE<span style="color:#b8ff00">.</span>
-    </h1>
-
-    <p class="hero-description">
-      VYRON é a interface de uma nova inteligência artificial.
-      Esta base será conectada ao núcleo de IA, memória e ferramentas.
-    </p>
-
-    <div class="hero-actions">
-      <button class="button primary" id="initializeAI">
-        ▷ INITIALIZE AI
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" data-view="chat" aria-label="Abrir chat">
+        <span class="brand-mark">V</span>
+        <span><b>VYRON</b><small>AI SOFTWARE ENGINEER</small></span>
       </button>
 
-      <button class="button" id="openCore">
-        OPEN CORE INTERFACE
-      </button>
-    </div>
-  </div>
-
-  <div class="hud">
-    <div class="hud-header">
-      <span>VYRON // CORE</span>
-      <span>LIVE</span>
-    </div>
-
-    <div class="hud-body">
-      <div class="avatar">VX</div>
-      <div class="hud-name">VYRON AI CORE</div>
-      <div class="hud-level">NEURAL BUILD 0.1</div>
-
-      <div class="stat">
-        <div class="stat-top"><span>AI CORE</span><span>READY</span></div>
-        <div class="stat-bar"><div class="stat-fill" style="width:96%"></div></div>
+      <div class="system-pulse">
+        <span class="dot online"></span>
+        <span>CORE <b>ONLINE</b></span>
+        <span class="hide-mobile">MODE <b id="modeLabel">AUTO</b></span>
       </div>
 
-      <div class="stat">
-        <div class="stat-top"><span>MEMORY</span><span>STANDBY</span></div>
-        <div class="stat-bar"><div class="stat-fill" style="width:94%"></div></div>
+      <div class="top-actions">
+        <button class="ghost" id="newChatBtn">+ NOVA SESSÃO</button>
+        <button class="icon-btn" id="settingsBtn" title="Configurações">⚙</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-item active" data-view="chat"><span>⌁</span><b>CHAT</b></button>
+        <button class="nav-item" data-view="projects"><span>▦</span><b>PROJETOS</b></button>
+        <button class="nav-item" data-view="knowledge"><span>◫</span><b>KNOWLEDGE</b></button>
+        <button class="nav-item" data-view="memory"><span>◇</span><b>MEMÓRIA</b></button>
+        <button class="nav-item" data-view="activity"><span>⌘</span><b>ATIVIDADE</b></button>
+      </nav>
+
+      <div class="sidebar-section">
+        <div class="section-label">SESSÕES</div>
+        <div id="sessionList" class="session-list"></div>
       </div>
 
-      <div class="stat">
-        <div class="stat-top"><span>SYSTEM</span><span>ONLINE</span></div>
-        <div class="stat-bar"><div class="stat-fill" style="width:100%"></div></div>
+      <div class="sidebar-bottom">
+        <div class="mini-status"><span>MODEL</span><b id="modelMini">DEMO CORE</b></div>
+        <div class="mini-status"><span>MEMORY</span><b id="memoryMini">LOCAL</b></div>
+        <button class="account-card" id="accountBtn"><span class="avatar">R</span><span><b>OPERADOR</b><small>LOCAL WORKSPACE</small></span></button>
       </div>
-    </div>
+    </aside>
+
+    <main class="workspace">
+      <section class="view active" id="view-chat">
+        <div class="chat-layout">
+          <div class="chat-main">
+            <div class="chat-head">
+              <div>
+                <p class="eyebrow">VYRON // INTERACTIVE CORE</p>
+                <h1 id="chatTitle">O que vamos construir?</h1>
+              </div>
+              <div class="mode-switch" id="modeSwitch">
+                <button class="active" data-mode="AUTO">AUTO</button>
+                <button data-mode="CODE">CODE</button>
+                <button data-mode="DEBUG">DEBUG</button>
+                <button data-mode="BUILD">BUILD</button>
+                <button data-mode="ARCHITECT">ARCH</button>
+              </div>
+            </div>
+
+            <div class="messages" id="messages"></div>
+
+            <div class="suggestions" id="suggestions">
+              <button data-prompt="Analise este projeto e encontre possíveis bugs sem alterar o que já funciona."><b>ANALISAR PROJETO</b><small>Encontre bugs e dependências.</small></button>
+              <button data-prompt="Quero criar um site completo. Me ajude a definir a melhor arquitetura."><b>CRIAR SITE</b><small>Frontend, backend e banco.</small></button>
+              <button data-prompt="Tenho um erro no meu código. Quero encontrar a causa raiz e corrigir."><b>DEBUG</b><small>Diagnóstico antes da correção.</small></button>
+            </div>
+
+            <div class="composer-wrap">
+              <div class="attachment-row" id="attachmentRow"></div>
+              <div class="composer">
+                <button class="attach-btn" id="attachBtn" title="Adicionar arquivos">＋</button>
+                <textarea id="promptInput" rows="1" placeholder="Descreva um problema, cole código ou envie seu projeto..."></textarea>
+                <div class="composer-tools">
+                  <button class="tool-toggle active" id="webToggle" title="Pesquisa web">WEB</button>
+                  <button class="tool-toggle active" id="memoryToggle" title="Memória">MEM</button>
+                  <button class="send-btn" id="sendBtn" title="Enviar">↑</button>
+                </div>
+              </div>
+              <div class="composer-foot"><span>ENTER para enviar · SHIFT+ENTER nova linha</span><span id="contextMeter">CONTEXT 0%</span></div>
+              <input type="file" id="fileInput" multiple hidden accept=".zip,.js,.ts,.jsx,.tsx,.html,.css,.json,.md,.txt,.py,.php,.java,.c,.cpp,.cs,.go,.rs,.sql,.xml,.yml,.yaml" />
+            </div>
+          </div>
+
+          <aside class="inspector" id="inspector">
+            <div class="inspector-head"><span>PROJECT CONTEXT</span><button id="collapseInspector">×</button></div>
+            <div class="drop-zone" id="dropZone">
+              <b>DROP PROJECT HERE</b>
+              <span>ZIP, JS, TS, HTML, CSS, PY, PHP, SQL...</span>
+            </div>
+            <div class="panel-block">
+              <div class="panel-title">FILES <span id="fileCount">0</span></div>
+              <div class="file-tree" id="fileTree"><div class="empty">Nenhum arquivo carregado.</div></div>
+            </div>
+            <div class="panel-block">
+              <div class="panel-title">DETECTED STACK</div>
+              <div class="chips" id="stackChips"><span>WAITING</span></div>
+            </div>
+            <div class="panel-block stats-grid">
+              <div><small>MEMORIES</small><b id="memoryCountSide">0</b></div>
+              <div><small>SOURCES</small><b id="sourceCountSide">0</b></div>
+              <div><small>SOLVED</small><b id="solvedCountSide">0</b></div>
+              <div><small>CONFIDENCE</small><b id="confidenceSide">—</b></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view dashboard-view" id="view-projects">
+        <div class="page-head"><p class="eyebrow">WORKSPACE</p><h2>Projetos</h2><p>Contextos independentes para cada código, stack e histórico de decisões.</p></div>
+        <div class="action-row"><button class="primary" id="createProjectBtn">+ NOVO PROJETO</button><button class="secondary" id="importProjectBtn">IMPORTAR ZIP</button></div>
+        <div class="card-grid" id="projectGrid"></div>
+      </section>
+
+      <section class="view dashboard-view" id="view-knowledge">
+        <div class="page-head"><p class="eyebrow">VYRON KNOWLEDGE ENGINE</p><h2>Conhecimento</h2><p>Base técnica recuperável por busca semântica. O backend poderá alimentar esta área com fontes permitidas e documentação oficial.</p></div>
+        <div class="knowledge-top">
+          <div class="metric-card"><small>DOCUMENTOS</small><b id="knowledgeDocs">0</b><span>indexados</span></div>
+          <div class="metric-card"><small>FONTES</small><b id="knowledgeSources">0</b><span>confiáveis</span></div>
+          <div class="metric-card"><small>VERIFICADAS</small><b id="knowledgeVerified">0</b><span>soluções</span></div>
+          <div class="metric-card"><small>QUEUE</small><b id="knowledgeQueue">3</b><span>tópicos</span></div>
+        </div>
+        <div class="two-col">
+          <div class="panel-card">
+            <div class="panel-card-head"><b>LEARNING QUEUE</b><span>AUTO DISCOVERY</span></div>
+            <div class="queue-list" id="learningQueue"></div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-card-head"><b>SOURCE POLICY</b><span>SAFE INGESTION</span></div>
+            <div class="policy-list">
+              <div><span class="ok">●</span><b>Documentação oficial</b><small>prioridade máxima</small></div>
+              <div><span class="ok">●</span><b>Changelogs / RFCs</b><small>versionamento e padrões</small></div>
+              <div><span class="warn">●</span><b>Fontes comunitárias</b><small>exigem validação</small></div>
+              <div><span class="bad">●</span><b>Bloqueado / restrito</b><small>não ingerir</small></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view dashboard-view" id="view-memory">
+        <div class="page-head"><p class="eyebrow">LONG-TERM CONTEXT</p><h2>Memória</h2><p>Preferências, decisões e conhecimento por projeto. Nesta versão são salvos localmente no navegador.</p></div>
+        <div class="action-row"><button class="primary" id="addMemoryBtn">+ ADICIONAR MEMÓRIA</button><button class="secondary" id="clearMemoryBtn">LIMPAR LOCAIS</button></div>
+        <div class="memory-list" id="memoryList"></div>
+      </section>
+
+      <section class="view dashboard-view" id="view-activity">
+        <div class="page-head"><p class="eyebrow">SYSTEM TRACE</p><h2>Atividade</h2><p>Eventos do workspace e do motor de resolução.</p></div>
+        <div class="terminal-card"><div class="terminal-head"><span>VYRON://TRACE</span><button id="clearActivityBtn">CLEAR</button></div><div class="terminal-body" id="activityLog"></div></div>
+      </section>
+    </main>
   </div>
-</section>
 
-<section class="section" id="ai-core">
-  <div class="section-header">
-    <div class="section-number">01 // AI CORE</div>
-    <h2 class="section-title">SYSTEM<br><span>READY.</span></h2>
-  </div>
+  <dialog class="modal" id="settingsModal">
+    <form method="dialog" class="modal-card">
+      <div class="modal-head"><div><p class="eyebrow">SYSTEM</p><h3>Configurações</h3></div><button value="cancel">×</button></div>
+      <label>Endpoint do backend<input id="apiEndpoint" placeholder="https://seu-backend.vercel.app/api/chat" /></label>
+      <label>Modelo / alias<input id="modelName" placeholder="VYRON CORE" /></label>
+      <label class="switch-row"><span><b>Pesquisa web</b><small>Permitir pesquisa atual quando suportada pelo backend.</small></span><input id="settingWeb" type="checkbox" checked /></label>
+      <label class="switch-row"><span><b>Memória</b><small>Usar contexto local ao montar solicitações.</small></span><input id="settingMemory" type="checkbox" checked /></label>
+      <p class="security-note">Não coloque chave de API aqui. Chaves devem permanecer no backend.</p>
+      <div class="modal-actions"><button value="cancel" class="secondary">CANCELAR</button><button value="default" class="primary" id="saveSettingsBtn">SALVAR</button></div>
+    </form>
+  </dialog>
 
-  <div class="terminal">
-    <div class="terminal-top">
-      <div class="terminal-dots"><span></span><span></span><span></span></div>
-      <span>VYRON_AI_INTERFACE</span>
-      <span>V0.1</span>
-    </div>
-    <div class="terminal-body" id="terminal">
-      <div><span class="green">vyron@core</span>:~$ initialize --ai</div>
-      <div>interface ........... READY</div>
-      <div>neural endpoint ..... NOT CONNECTED</div>
-      <div>memory .............. NOT CONNECTED</div>
-      <br>
-      <div class="green">FRONTEND READY FOR AI INTEGRATION.</div>
-      <div>Next step: connect the model API. <span class="cursor"></span></div>
-    </div>
-  </div>
-</section>
+  <dialog class="modal" id="memoryModal">
+    <form method="dialog" class="modal-card small">
+      <div class="modal-head"><div><p class="eyebrow">MEMORY</p><h3>Nova memória</h3></div><button value="cancel">×</button></div>
+      <label>Título<input id="memoryTitleInput" placeholder="Ex.: Preferência de edição" /></label>
+      <label>Conteúdo<textarea id="memoryContentInput" rows="5" placeholder="Ex.: Preserve o design existente quando corrigir bugs."></textarea></label>
+      <div class="modal-actions"><button value="cancel" class="secondary">CANCELAR</button><button value="default" class="primary" id="saveMemoryBtn">SALVAR</button></div>
+    </form>
+  </dialog>
 
-<footer>
-  <div class="footer-main">
-    <div class="footer-logo">VYRON<span style="color:#b8ff00">.</span></div>
-
-    <div class="footer-right">
-      VYRON AI INTERFACE<br>
-      NEURAL SYSTEM / MEMORY / TOOLS<br><br>
-      FRONTEND: ONLINE
-    </div>
-  </div>
-
-  <div class="footer-bottom">
-    <span>© 2026 VYRON</span>
-    <span>ALL SYSTEMS OPERATIONAL</span>
-    <span>VX/01</span>
-  </div>
-</footer>
-
-<script>
-const boot = document.getElementById("boot");
-const progress = document.getElementById("bootProgress");
-const bootStatus = document.getElementById("bootStatus");
-const bootPercent = document.getElementById("bootPercent");
-
-const bootStages = [
-  [0, "// INITIALIZING"],
-  [18, "// CONNECTING TO VYRON NODE"],
-  [37, "// LOADING AI INTERFACE"],
-  [58, "// SYNCHRONIZING CORE"],
-  [76, "// STARTING AI INTERFACE"],
-  [91, "// ESTABLISHING GLOBAL LINK"],
-  [100, "// SYSTEM ONLINE"]
-];
-
-const bootStart = performance.now();
-const bootDuration = 4300;
-
-function updateBoot(now){
-  const elapsed = now - bootStart;
-  const value = Math.min(100, (elapsed / bootDuration) * 100);
-
-  progress.style.width = value + "%";
-  bootPercent.textContent =
-    String(Math.floor(value)).padStart(3, "0") + "%";
-
-  let stage = bootStages[0];
-
-  for(const item of bootStages){
-    if(value >= item[0]) stage = item;
-  }
-
-  bootStatus.textContent = stage[1];
-
-  if(value < 100) requestAnimationFrame(updateBoot);
-}
-
-requestAnimationFrame(updateBoot);
-
-setTimeout(() => {
-  boot.classList.add("hidden");
-}, bootDuration + 650);
-
-function skipBoot(){
-  boot.classList.add("hidden");
-}
-
-document.addEventListener("keydown", event => {
-  if(event.code === "Space" || event.code === "Escape"){
-    skipBoot();
-  }
-});
-
-function updateClock() {
-  const now = new Date();
-
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const seconds = String(now.getSeconds()).padStart(2, "0");
-
-  document.getElementById("clock").textContent =
-    `${hours}:${minutes}:${seconds}`;
-}
-
-updateClock();
-setInterval(updateClock, 1000);
-
-document.getElementById("initializeAI")?.addEventListener("click", () => {
-  document.getElementById("ai-core")?.scrollIntoView({behavior:"smooth"});
-});
-
-document.getElementById("openCore")?.addEventListener("click", () => {
-  document.getElementById("ai-core")?.scrollIntoView({behavior:"smooth"});
-});
-
-document.addEventListener("keydown", event => {
-  if (event.code === "Space") {
-    boot.classList.add("hidden");
-  }
-});
-
-/* =========================
-   VYRON CODE RAIN
-   Inspired by the reference motion:
-   sparse vertical streams, slow descent,
-   cyan/blue with occasional violet signals.
-========================= */
-
-(() => {
-  const canvas = document.getElementById("codeRain");
-  const ctx = canvas.getContext("2d");
-
-  const glyphs =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    + "0123456789"
-    + "01<>[]{}=+*/:|";
-
-  let width = 0;
-  let height = 0;
-  let dpr = 1;
-  let streams = [];
-
-  function randomGlyph() {
-    return glyphs[Math.floor(Math.random() * glyphs.length)];
-  }
-
-  function makeStream(x) {
-    const count = 7 + Math.floor(Math.random() * 15);
-
-    return {
-      x,
-      y: Math.random() * height - height,
-      speed: 17 + Math.random() * 24, // px/sec — slow like the reference
-      gap: 13 + Math.random() * 6,
-      size: 10 + Math.random() * 4,
-      count,
-      alpha: 0.16 + Math.random() * 0.27,
-      hue: Math.random() < 0.13 ? "violet" : "cyan",
-      chars: Array.from({length: count}, randomGlyph),
-      changeTimer: 0
-    };
-  }
-
-  function resizeRain() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    width = window.innerWidth;
-    height = window.innerHeight;
-
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // The reference uses widely spaced, individual vertical streams.
-    const spacing = width < 700 ? 38 : 52;
-    const amount = Math.ceil(width / spacing);
-
-    streams = [];
-
-    for (let i = 0; i < amount; i++) {
-      const stream = makeStream(
-        i * spacing + Math.random() * 18
-      );
-
-      // Some streams start lower/higher to avoid synchronization.
-      stream.y = Math.random() * height - height * 0.75;
-
-      streams.push(stream);
-    }
-  }
-
-  let previous = performance.now();
-
-  function draw(now) {
-    const dt = Math.min((now - previous) / 1000, 0.05);
-    previous = now;
-
-    ctx.clearRect(0, 0, width, height);
-
-    for (const stream of streams) {
-      stream.y += stream.speed * dt;
-      stream.changeTimer += dt;
-
-      // Occasionally change one character, keeping the stream alive.
-      if (stream.changeTimer > 0.10) {
-        stream.changeTimer = 0;
-
-        if (Math.random() < 0.45) {
-          const index =
-            Math.floor(Math.random() * stream.chars.length);
-
-          stream.chars[index] = randomGlyph();
-        }
-      }
-
-      ctx.font =
-        `${Math.round(stream.size)}px "IBM Plex Mono", monospace`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-
-      for (let i = 0; i < stream.chars.length; i++) {
-        const y = stream.y - i * stream.gap;
-
-        if (y < -stream.size || y > height + stream.size) {
-          continue;
-        }
-
-        const fade = 1 - i / stream.chars.length;
-        const alpha = stream.alpha * fade;
-
-        if (stream.hue === "violet") {
-          ctx.fillStyle =
-            `rgba(184, 45, 255, ${alpha})`;
-        } else {
-          ctx.fillStyle =
-            `rgba(24, 210, 238, ${alpha})`;
-        }
-
-        ctx.fillText(stream.chars[i], stream.x, y);
-      }
-
-      // Restart the stream after it leaves the viewport.
-      const tail = stream.chars.length * stream.gap;
-
-      if (stream.y - tail > height) {
-        stream.y = -20 - Math.random() * height * 0.65;
-        stream.speed = 17 + Math.random() * 24;
-        stream.count = 7 + Math.floor(Math.random() * 15);
-        stream.chars = Array.from(
-          {length: stream.count},
-          randomGlyph
-        );
-        stream.alpha = 0.16 + Math.random() * 0.27;
-        stream.hue =
-          Math.random() < 0.13 ? "violet" : "cyan";
-      }
-    }
-
-    requestAnimationFrame(draw);
-  }
-
-  window.addEventListener(
-    "resize",
-    resizeRain,
-    {passive: true}
-  );
-
-  resizeRain();
-  requestAnimationFrame(draw);
-})();
-
-</script>
-
+  <script src="assets/app.js"></script>
 </body>
 </html>
