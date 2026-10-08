@@ -1,20 +1,17 @@
-# VYRON AI — Interface Minimal
+# VYRON — Frontend Final
 
-Interface frontend baseada no conceito visual aprovado: foco total em chat + projeto atual.
+Interface final do VYRON AI Software Engineer.
 
-## Abrir
-Abra `index.html` no navegador ou publique a pasta no GitHub Pages.
+## Incluído
+- Home minimalista focada no chat
+- Histórico de sessões
+- Modos AUTO / DEBUG / BUILD
+- Upload de arquivos
+- Detecção básica de stack
+- Projeto atual com painel recolhível
+- Transição automática da home para a conversa
+- Sessões e contexto salvos no navegador
+- Layout responsivo
 
-## Recursos já funcionais no frontend
-- sessões/histórico local
-- modo AUTO / DEBUG / BUILD
-- criação de projeto
-- upload e drag-and-drop de arquivos
-- detecção simples de stack
-- contexto do projeto
-- chat demo
-- persistência via localStorage
-- layout responsivo
-
-## Próximo passo
-Conectar o composer ao backend VYRON Core (modelo de IA, Supabase, pesquisa web e ferramentas).
+## Observação
+A interface ainda usa respostas DEMO. O próximo passo é conectar o frontend ao backend real da IA, memória, pesquisa web e banco de dados.

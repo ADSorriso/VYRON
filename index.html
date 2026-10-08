@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#070a08" />
+  <meta name="theme-color" content="#060806" />
   <title>VYRON — AI Software Engineer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,24 +11,31 @@
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <div class="matrix" aria-hidden="true"></div>
+  <div class="ambient-grid" aria-hidden="true"></div>
 
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark">V</div>
-      <div>
+      <div class="brand-copy">
         <strong>VYRON</strong>
         <span>AI SOFTWARE ENGINEER</span>
       </div>
     </div>
+
     <div class="core-status"><i></i><span>CORE ONLINE</span></div>
+
+    <div class="active-project-chip hidden" id="activeProjectChip">
+      <span class="project-dot"></span><span id="activeProjectChipName">projeto</span>
+    </div>
+
     <div class="top-actions">
+      <button id="toggleProjectPanelBtn" class="icon-btn project-toggle" aria-label="Mostrar ou ocultar painel do projeto" title="Painel do projeto">▤</button>
       <button id="newProjectBtn" class="btn btn-outline">＋ NOVO PROJETO</button>
       <button id="settingsBtn" class="icon-btn" aria-label="Configurações">⚙</button>
     </div>
   </header>
 
-  <div class="app-shell">
+  <div class="app-shell" id="appShell">
     <aside class="sidebar conversations-panel">
       <div class="panel-head">
         <span>CONVERSAS</span>
@@ -36,7 +43,7 @@
       </div>
       <nav id="sessionList" class="session-list"></nav>
       <div class="sidebar-footer">
-        <button class="account-row"><span class="user-icon">♙</span><span>Conta</span></button>
+        <button class="account-row"><span class="user-icon">◎</span><span>Conta</span></button>
       </div>
     </aside>
 
@@ -48,13 +55,13 @@
           <p>Descreva seu problema, cole seu código ou envie seu projeto.<br>Eu vou analisar, planejar e construir com você.</p>
         </div>
 
-        <div class="composer-wrap">
+        <div class="composer-wrap" id="homeComposer">
           <div id="dropOverlay" class="drop-overlay">SOLTE O PROJETO AQUI</div>
-          <textarea id="promptInput" rows="5" placeholder="Descreva seu problema, cole código ou envie seu projeto..."></textarea>
+          <textarea id="promptInput" rows="6" placeholder="Descreva seu problema, cole código ou envie seu projeto..."></textarea>
           <div class="composer-actions">
             <div class="left-actions">
               <label class="attach-btn">⌕ <span>Anexar</span><input id="fileInput" type="file" multiple hidden></label>
-              <button id="clearContextBtn" class="ghost-btn">Limpar contexto</button>
+              <button id="clearContextBtn" class="icon-action hidden" aria-label="Limpar contexto" title="Limpar arquivos do contexto">⌫</button>
             </div>
             <div class="right-actions">
               <div class="mode-switch" role="tablist" aria-label="Modo">
@@ -67,6 +74,8 @@
           </div>
         </div>
 
+        <div id="homeContextHint" class="context-hint hidden"></div>
+
         <div class="engine-strip">
           <div><span></span> VYRON AI ENGINE <span></span></div>
           <small>ANÁLISE · PLANEJAMENTO · IMPLEMENTAÇÃO</small>
@@ -74,52 +83,64 @@
       </section>
 
       <section id="chatView" class="chat-view hidden">
+        <div class="chat-header">
+          <div>
+            <span class="chat-kicker">VYRON // SESSION</span>
+            <h2 id="chatSessionTitle">Nova sessão</h2>
+          </div>
+          <div id="chatContextBadge" class="chat-context-badge hidden"></div>
+        </div>
         <div id="chatMessages" class="chat-messages"></div>
         <div class="chat-composer">
           <textarea id="chatInput" rows="2" placeholder="Continue a conversa..."></textarea>
           <div class="chat-composer-bottom">
             <label class="attach-btn compact">⌕ <span>Anexar</span><input id="chatFileInput" type="file" multiple hidden></label>
-            <div class="mode-switch compact-switch" role="tablist">
+            <div class="mode-switch compact-switch" role="tablist" aria-label="Modo da conversa">
               <button class="mode-btn active" data-mode="AUTO">AUTO</button>
               <button class="mode-btn" data-mode="DEBUG">DEBUG</button>
               <button class="mode-btn" data-mode="BUILD">BUILD</button>
             </div>
-            <button id="chatSendBtn" class="send-btn small">➤</button>
+            <button id="chatSendBtn" class="send-btn small" aria-label="Enviar">➤</button>
           </div>
         </div>
       </section>
     </main>
 
-    <aside class="sidebar project-panel">
-      <section class="project-block">
-        <div class="project-title">▱ &nbsp; PROJETO ATUAL</div>
-        <div id="projectCard" class="project-card">
-          <div class="project-icon">▰</div>
-          <div class="project-info">
-            <strong id="projectName">Nenhum projeto</strong>
-            <small id="projectPath">anexe arquivos ou crie um projeto</small>
+    <aside class="sidebar project-panel" id="projectPanel">
+      <div class="project-panel-head">
+        <span>PROJETO</span>
+        <button id="closeProjectPanelBtn" class="panel-close" aria-label="Fechar painel">×</button>
+      </div>
+
+      <div id="emptyProjectState" class="empty-project-state">
+        <div class="empty-icon">▱</div>
+        <strong>Nenhum projeto ativo</strong>
+        <p>Anexe arquivos ou crie um projeto para adicionar contexto ao VYRON.</p>
+        <button id="emptyCreateProjectBtn" class="btn btn-primary soft">CRIAR PROJETO</button>
+      </div>
+
+      <div id="projectContent" class="hidden">
+        <section class="project-block">
+          <div id="projectCard" class="project-card">
+            <div class="project-icon">▰</div>
+            <div class="project-info">
+              <strong id="projectName">Projeto</strong>
+              <small id="projectPath">~/workspace/projeto</small>
+            </div>
+            <button class="ellipsis" aria-label="Opções">•••</button>
           </div>
-          <button class="ellipsis">•••</button>
-        </div>
-      </section>
+        </section>
 
-      <section class="project-block files-block">
-        <div class="section-title"><span>ARQUIVOS</span><small id="fileCount">0</small></div>
-        <div id="fileList" class="file-list"><p class="muted">Nenhum arquivo carregado.</p></div>
-      </section>
+        <section class="project-block files-block">
+          <div class="section-title"><span>ARQUIVOS</span><small id="fileCount">0</small></div>
+          <div id="fileList" class="file-list"></div>
+        </section>
 
-      <section class="project-block stack-block">
-        <div class="section-title"><span>STACK</span></div>
-        <div id="stackTags" class="stack-tags"><span class="tag muted-tag">AGUARDANDO</span></div>
-      </section>
-
-      <section class="project-block status-block">
-        <div class="section-title"><span>CONTEXTO</span></div>
-        <div class="mini-stats">
-          <div><small>ARQUIVOS</small><strong id="statFiles">0</strong></div>
-          <div><small>MODO</small><strong id="statMode">AUTO</strong></div>
-        </div>
-      </section>
+        <section class="project-block stack-block">
+          <div class="section-title"><span>STACK</span></div>
+          <div id="stackTags" class="stack-tags"></div>
+        </section>
+      </div>
     </aside>
   </div>
 
@@ -138,8 +159,9 @@
       <button class="modal-close" data-close="settingsModal">×</button>
       <span class="modal-kicker">CONFIGURAÇÕES</span>
       <h2>VYRON Core</h2>
-      <div class="setting-row"><div><strong>Backend</strong><small>Endpoint usado futuramente para conectar a IA real.</small></div><span class="status-pill">DEMO</span></div>
-      <div class="setting-row"><div><strong>Memória local</strong><small>Sessões e projeto ficam salvos neste navegador.</small></div><span class="status-pill green">ATIVA</span></div>
+      <div class="setting-row"><div><strong>Backend</strong><small>Interface pronta para conexão com o endpoint real da IA.</small></div><span class="status-pill">DEMO</span></div>
+      <div class="setting-row"><div><strong>Memória local</strong><small>Sessões e contexto ficam salvos neste navegador.</small></div><span class="status-pill green">ATIVA</span></div>
+      <div class="setting-row"><div><strong>Modo padrão</strong><small>O VYRON decide entre análise, debug e construção.</small></div><span class="status-pill green">AUTO</span></div>
       <button id="resetDataBtn" class="btn danger">RESETAR DADOS LOCAIS</button>
     </div>
   </div>
